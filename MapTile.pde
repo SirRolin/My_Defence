@@ -7,7 +7,7 @@ class MapTile extends Tile {
   MapTile(Coord coord, byte nextEdge) {
     super(coord);
     this.nextEdge = nextEdge;
-    this.nextTile = this;
+    //this.nextTile = this;
     ArrayList<Byte> possibleExcapes = new ArrayList<Byte>();
     byte ite = 0;
     for (byte side = 0; side < 4; ++side) {
@@ -18,15 +18,16 @@ class MapTile extends Tile {
         }
       }
     }
-    if (possibleExcapes.size() == 0) {
-      spawnPoints.add(new SpawnPoint(coord, nextTile, progress * 20));
+    if (possibleExcapes.size() == 0 || (pressedKeys.contains((int) 'P') && debuggingLevel > 0)) {
+      spawnPoints.add(new SpawnPoint(coord.newCoord(), this));
     } else {
-      Byte numExcapes = (byte) Math.min(random(1, possibleExcapes.size()+1),random(1, possibleExcapes.size()+1));
+      Byte numExcapes = (byte) Math.min(Math.min(random(1, possibleExcapes.size()+1),random(1, possibleExcapes.size()+1)), random(1, possibleExcapes.size()+1));
       //println("numExcapes after min random: " + numExcapes);
       for (ite = 0; ite < numExcapes; ++ite) {
         Byte tempSide = pickRandomFromArrayList(possibleExcapes);
         edges[tempSide] = true;
-        spawnPoints.add(new SpawnPoint(coord.getAdjecent(tempSide, 0.5), this, progress * 20));
+        possibleExcapes.remove(Byte.valueOf(tempSide));
+        spawnPoints.add(new SpawnPoint(coord.getAdjecent(tempSide, 0.5), this));
       }
       //print("possibles: ");
       //for(byte b: possibleExcapes){ print(b + " "); }

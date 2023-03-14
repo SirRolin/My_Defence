@@ -5,11 +5,13 @@ class Enemy{
   float HP;
   float speed;
   int icon;
-  int TowerDamage = 2;
+  int TowerDamage = 1;
   public MapTile nextTile;
   public Coord coord;
   int pointsWorth;
   int ID;
+  int spawnCD;
+  
   Enemy(Coord coord, MapTile nextTile){
     this.ID = enemyID;
     ++enemyID;
@@ -18,8 +20,9 @@ class Enemy{
     //// Temporarily just use these values as I don't need to impliment multiple enemy types yet.
     pointsWorth = 1;
     HP = 10;
-    speed = 1;
+    speed = 5;
     icon = 1;
+    spawnCD = 50;
   }
 
   public void Update(){
@@ -28,12 +31,10 @@ class Enemy{
 
   private void move() {
     float movement = (speed / (float) speedDivide);
-    //print(movement);
-    if(movement > 0) this.move(movement);
+    this.move(movement);
   }
   
   private void move(float movement) {
-    if(movement < 1.0E-5) return;
     if(nextTile == null){
       towerHealth -= TowerDamage;
       if(towerHealth <= 0) {
@@ -43,21 +44,21 @@ class Enemy{
       deleteMe();
       return;
     }
+    if(movement <= 1.0E-5) return;
     float xDiff = nextTile.coord.x - coord.x;
     float yDiff = nextTile.coord.y - coord.y;
-    println("diff: "+(abs(xDiff*xDiff)+abs(yDiff*yDiff))+" of movement: "+(movement*movement));
     if(abs(xDiff*xDiff)+abs(yDiff*yDiff) <= movement*movement){
-      //println((xDiff * xDiff) + (yDiff * yDiff) - (movement * movement));
-      float movementToNext = FastMath.mySqrt(abs(xDiff * xDiff) + abs(yDiff * yDiff) - (movement * movement));
+      float movementToNext = (float) FastMath.mySqrt(abs(xDiff * xDiff) + abs(yDiff * yDiff));
       coord.x = nextTile.coord.x;
       coord.y = nextTile.coord.y;
       nextTile = nextTile.nextTile;
-      this.move(movement - movementToNext);
+      if(movement - movementToNext > 0) {
+        this.move(movement - movementToNext);
+      }
     } else {
       float normaliseDivide = java.lang.Math.max(abs(xDiff),abs(yDiff));
       boolean negX = xDiff<0?true:false;
       boolean negY = yDiff<0?true:false;
-      //println("normaliseDivide: " + normaliseDivide);
       if(normaliseDivide != 0){
         xDiff = xDiff / normaliseDivide;
         yDiff = yDiff / normaliseDivide;
@@ -65,16 +66,16 @@ class Enemy{
         xDiff = 0;
         yDiff = 0;
       }
-      if((yDiff * yDiff) > 1) {
+      if(yDiff > 1) {
         println("error yDiff: " + yDiff);
         noLoop();
       }
-      float tempXDiff = FastMath.mySqrt(1 - (yDiff * yDiff));
-      if((xDiff * xDiff) > 1) {
+      if(xDiff > 1) {
         println("error xDiff: " + xDiff);
         noLoop();
       }
-      yDiff = FastMath.mySqrt(1 - (xDiff * xDiff));
+      float tempXDiff = (float) FastMath.mySqrt(1 - (yDiff * yDiff));
+      yDiff = (float) FastMath.mySqrt(1 - (xDiff * xDiff));
       xDiff = tempXDiff;
       
       coord.x += xDiff * movement * (negX?-1:1);

@@ -9,12 +9,17 @@ ArrayList<SpawnPoint> spawnPoints = new ArrayList();
 ArrayList<Enemy> enemies = new ArrayList();
 HashSet<Integer> pressedKeys = new HashSet<Integer>();
 boolean hasEnemies = false;
-byte debuggingLevel = 3;
+byte debuggingLevel = 7; // between 0-7
 byte speed = 1;
+boolean paused = false;
 int level = 0;
 long enemyPoints = 0;
 int towerHealth = 100;
 int enemyID = 0;
+int updateRate = 60;
+
+//// used for Source: https://forum.processing.org/two/discussion/18478/deltatime.html
+long timeOfFrame;
 
 
 final int A     = 65;
@@ -27,51 +32,59 @@ final int W     = 87;
 
 void setup() {
   fullScreen();
-  frameRate(10);
+  frameRate(updateRate);
   rectMode(CENTER);
-  tiles.add(new MapTile(new Coord(0, 0), (byte) -1));
+  MapTile towerTile = new MapTile(new Coord(0, 0), (byte) -1);
+  towerTile.progress = 1;
+  tiles.add(towerTile);
+  
 }
 
 void draw() {
-  //// setting frames moment in time
-  long timeOfFrame = millis() / 500;
-  
-  //// Updates
+  //// Delta Time for time control no matter framerate.
+  //// Source: https://forum.processing.org/two/discussion/18478/deltatime.html
+  double delta = (-timeOfFrame + (timeOfFrame = frameRateLastNanos))/1e6d;
+
+  //// Limiting Delta Time so it doesn't cause unwanted sideeffects at very low framerates.
+  if(delta > 50) delta = 50;
+
+//// Updates
+  for(int updateInFrame = 0; !paused && updateInFrame < speed; ++updateInFrame){
     //// Spawn of Enemies
-  if(hasEnemies){
-    boolean AnySpawnPointsOpen = false;
-    for(SpawnPoint point: spawnPoints){
-      if((point.lastSpawned + point.spawnCD) < timeOfFrame){
-        AnySpawnPointsOpen = true;
-        point.open = true;
-      }
-    }
-    ////Spawn Enemies
-    while(enemyPoints > 0 && AnySpawnPointsOpen){
-      println("am I stuck?");
+    if(hasEnemies){
+      boolean AnySpawnPointsOpen = false;
       for(SpawnPoint point: spawnPoints){
+        point.Update(delta);
         if(point.open){
-          Enemy tmpEnemy = new Enemy(point.coord, point.nextTile);
-          point.open = false;
-          enemyPoints -= tmpEnemy.pointsWorth;
-          //point.lastSpawned += point.spawnCD;
-          //tmpEnemy.nextTile = point.nextTile;
-          enemies.add(tmpEnemy);
-          break;
-        }
-      }
-      AnySpawnPointsOpen = false;
-      for(SpawnPoint point: spawnPoints){
-        if((point.lastSpawned + point.spawnCD) < timeOfFrame){
           AnySpawnPointsOpen = true;
         }
       }
-      if(!AnySpawnPointsOpen) break;
+      ////Spawn Enemies
+      while(enemyPoints > 0 && AnySpawnPointsOpen){
+        for(SpawnPoint point: spawnPoints){
+          if(point.open){
+            Enemy tmpEnemy = new Enemy(point.coord, point.nextTile);
+            point.open = false;
+            enemyPoints -= tmpEnemy.pointsWorth;
+            point.spawnCD = tmpEnemy.spawnCD / (1.0 + point.getSpawnCDR()/10.0) * spawnPoints.size();
+            enemies.add(tmpEnemy);
+            break;
+          }
+        }
+        AnySpawnPointsOpen = false;
+        for(SpawnPoint point: spawnPoints){
+          if(point.open){
+            AnySpawnPointsOpen = true;
+          }
+        }
+        if(!AnySpawnPointsOpen) break;
+      }
     }
-  }
-  ////Update Enemies
-  for(int i = enemies.size() - 1; i >= 0; --i){
-    enemies.get(i).Update();
+  
+    ////Update Enemies
+    for(int i = enemies.size() - 1; i >= 0; --i){
+      enemies.get(i).Update();
+    }
   }
   
   //// Display
@@ -92,10 +105,22 @@ void draw() {
   //// Round active?
   text("enemies: " + str(enemies.size()), width/2, 50);
   
+//// Debugging info Left
+  String infoLeft = "";
   //// timeOfFrame?
-  if (debuggingLevel % 4 - (debuggingLevel % 2) == 2) {
-    text("time of frame: " + str(timeOfFrame), 20, 40);
-    text("spawnPoint 1 last spawn time: " + str(spawnPoints.get(0).lastSpawned), 20, 60);
+  if (debuggingLevel % 4 >= 2) {
+    infoLeft += "time: " + timeOfFrame + " - Delta: " + delta + ".\n";
+  }
+  
+  //// spawn CDS
+  if (debuggingLevel % 8 >= 4) {
+    infoLeft += "spawnPoint CDs: " + "\n";
+    for(SpawnPoint sp: spawnPoints){
+      infoLeft += sp.spawnCD + "\n";
+    }
+  }
+  if (infoLeft.length() > 0) {
+    text(infoLeft, 20, 40);
   }
   
   //// draw everything
@@ -159,7 +184,10 @@ void keyPressed() {
 
 void FirstKeyPressed(int keycode) {
   if (keycode == (int) '\t' ) {
-    speed = (byte) ((speed +  1) % 4);
+    speed = (byte) (speed % 3 + 1);
+  }
+  if (keycode == (int) ' ' ) {
+    paused = !paused;
   }
 }
 

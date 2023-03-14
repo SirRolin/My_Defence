@@ -25,8 +25,6 @@ class ExpandTile extends Tile {
     float x = width/2 + camX * size + coord.x * size;
     float y = height/2 + camY * size + coord.y * size;
     if((abs(mousex - x) < size/2) && (abs(mousey - y) < size/2)){
-      //byte nextTile = 3;
-      //println("nextTile: " + nextTile + ". x:" + (parent.coord.x - coord.x) + ". y: " + (parent.coord.y - coord.y) + ".");
       tiles.add(new MapTile(coord, parent, prevEdge, parent.progress + 1));
       ++level;
       hasEnemies = true;

@@ -1,14 +1,26 @@
 public class SpawnPoint {
     public Coord coord;
     public MapTile nextTile;
-    public int lastSpawned = 0;
-    public int spawnCD;
+    public float spawnCD = 0.0;
     public boolean open = true;
-    public SpawnPoint (Coord coord, MapTile nextTile, int spawnCD) {
+    public SpawnPoint (Coord coord, MapTile nextTile) {
         this.coord = coord;
-        this.spawnCD = spawnCD;
         this.nextTile = nextTile;
     }
+    
+    public void Update(double updateSpeed){
+      if(!open){
+          spawnCD -= 20.0 / updateSpeed;
+          if(spawnCD <= 0){
+              open = true;
+          }
+      }
+    }
+    
+    public int getSpawnCDR(){
+      return nextTile.progress;
+    }
+
     public void Display(){
         float size = 100 * zoom / 20.0;
         float x = width/2 + camX * size + coord.x * size;

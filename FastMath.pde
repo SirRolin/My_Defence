@@ -1,28 +1,30 @@
 import java.lang.Math;
 
 public static class FastMath {
-  private static Float[] mySqrts = new Float[27];
+  private static Double[] mySqrts = new Double[27];
 
-  public static float mySqrt(float input) {
-    int floorInput = floor((input+4.0E-4)/25);
-    //println(input);
-    if(input<-4.0E-4){
-      println("input tooo low?: " + input);
+  public static double mySqrt(float input) {
+    int floorInput = (int) (input*25);
+    float flooredToInterval = floorInput / 25.0;
+    if(input<-1.0E-14){
+      println("input too low: " + input + "Returning 0;");
       return 0;
     }
     if (input > 1) {
-      return (float) Math.sqrt((double) input);
-    } else if (input > 0 && mySqrts[floor(input/25)] != null && mySqrts[floor(input/25)+1] != null) {
-      return mySqrts[floorInput] * (input % 1 / 25) +
-        mySqrts[floorInput+1] * (1-input % 1 / 25);
+      return Math.sqrt((double) input);
+    } else if (flooredToInterval == input && mySqrts[floorInput] != null){
+      return mySqrts[floorInput];
+    } else if (input > 0 && mySqrts[floorInput] != null && mySqrts[floorInput+1] != null) {
+      return mySqrts[floorInput] * ((input % (1.0 / 25.0)) * 25) +
+        mySqrts[floorInput+1] * (((1.0/25.0) - (input % (1.0 / 25.0))) * 25);
     } else {
       if (mySqrts[floorInput] == null) {
-        mySqrts[floorInput] = (float) Math.sqrt((double) floorInput*25);
+        mySqrts[floorInput] = Math.sqrt((double) input - (input % (1.0 / 25.0)));
       }
       if (mySqrts[floorInput+1] == null) {
-        mySqrts[floorInput+1] = (float) Math.sqrt((double) (floorInput+1)*25);
+        mySqrts[floorInput+1] = Math.sqrt((double) input - (input % (1.0 / 25.0)) + (1.0 / 25.0));
       }
-      return (float) Math.sqrt((double) input);
+      return Math.sqrt((double) input);
     }
   }
 }
