@@ -7,6 +7,7 @@ class MapTile extends Tile {
   MapTile(Coord coord, byte nextEdge) {
     super(coord);
     this.nextEdge = nextEdge;
+    this.nextTile = this;
     ArrayList<Byte> possibleExcapes = new ArrayList<Byte>();
     byte ite = 0;
     for (byte side = 0; side < 4; ++side) {
@@ -18,11 +19,14 @@ class MapTile extends Tile {
       }
     }
     if (possibleExcapes.size() == 0) {
+      spawnPoints.add(new SpawnPoint(coord, nextTile, progress * 20));
     } else {
       Byte numExcapes = (byte) Math.min(random(1, possibleExcapes.size()+1),random(1, possibleExcapes.size()+1));
       //println("numExcapes after min random: " + numExcapes);
       for (ite = 0; ite < numExcapes; ++ite) {
-        edges[pickRandomFromArrayList(possibleExcapes)] = true;
+        Byte tempSide = pickRandomFromArrayList(possibleExcapes);
+        edges[tempSide] = true;
+        spawnPoints.add(new SpawnPoint(coord.getAdjecent(tempSide, 0.5), this, progress * 20));
       }
       //print("possibles: ");
       //for(byte b: possibleExcapes){ print(b + " "); }
@@ -32,6 +36,13 @@ class MapTile extends Tile {
           byte prevEdge = (byte) ((side + 2) % 4);
           expandTiles.add(new ExpandTile(coord.getAdjecent(side), this, prevEdge));
         }
+      }
+    }
+    
+    for(ite = (byte) (spawnPoints.size() - 1); ite >= 0 ; --ite){
+      //System.out.println(coord.getAdjecent(nextEdge, 0.5));
+      if(spawnPoints.get(ite).coord.equals(coord.getAdjecent(nextEdge, 0.5))) {
+        spawnPoints.remove(ite);
       }
     }
   }
@@ -79,7 +90,7 @@ class MapTile extends Tile {
     if(nextEdge==-1){
       fill(11); // the tower
     } else if(countStates(edges, true)==1){
-      fill(150,150,0); // purple portal
+      fill(159, 43, 104); // purple portal
     }
     rect(x,y,size/4,size/4);
     

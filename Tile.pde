@@ -4,10 +4,10 @@ class Tile {
     this.coord = coord;
   }
   
-  private boolean intercept(Tile otherTile){
+  public boolean intercept(Tile otherTile){
     return this.coord.x == otherTile.coord.x && this.coord.y == otherTile.coord.y;
   }
-  private boolean intercept(Coord coord){
+  public boolean intercept(Coord coord){
     return coord.x == this.coord.x && coord.y == this.coord.y;
   }
   private boolean interceptsAny(ArrayList Tiles){

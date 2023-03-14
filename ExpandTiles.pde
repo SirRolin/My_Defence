@@ -28,6 +28,10 @@ class ExpandTile extends Tile {
       //byte nextTile = 3;
       //println("nextTile: " + nextTile + ". x:" + (parent.coord.x - coord.x) + ". y: " + (parent.coord.y - coord.y) + ".");
       tiles.add(new MapTile(coord, parent, prevEdge, parent.progress + 1));
+      ++level;
+      hasEnemies = true;
+      enemyID= 0;
+      enemyPoints = level * level;
       return true;
     }
     return false;
