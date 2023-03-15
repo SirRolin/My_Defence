@@ -37,10 +37,6 @@ class Enemy{
   private void move(float movement) {
     if(nextTile == null){
       towerHealth -= TowerDamage;
-      if(towerHealth <= 0) {
-        fill(0);
-        text("Game Over", width/2, height/2);
-      }
       deleteMe();
       return;
     }

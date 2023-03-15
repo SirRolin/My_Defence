@@ -37,7 +37,6 @@ void setup() {
   MapTile towerTile = new MapTile(new Coord(0, 0), (byte) -1);
   towerTile.progress = 1;
   tiles.add(towerTile);
-  
 }
 
 void draw() {
@@ -85,6 +84,10 @@ void draw() {
     for(int i = enemies.size() - 1; i >= 0; --i){
       enemies.get(i).Update();
     }
+  }
+  
+  if(towerHealth <= 0) {
+    resetGame();
   }
   
   //// Display
@@ -161,6 +164,28 @@ void draw() {
   
   fill(0);
   text("x: " + camX + ". y: " + camY + ". z:" + str(zoom/20.0), 20, 20); // display zoom
+}
+
+void newStart(){
+  MapTile towerTile = new MapTile(new Coord(0, 0), (byte) -1);
+  towerTile.progress = 1;
+  tiles.add(towerTile);
+}
+
+void resetGame(){
+  camX = 0;
+  camY = 0;
+  zoom = 20; // ends up deviding with 20
+  tiles = new ArrayList();
+  expandTiles = new ArrayList();
+  spawnPoints = new ArrayList();
+  enemies = new ArrayList();
+  hasEnemies = false;
+  level = 0;
+  enemyPoints = 0;
+  towerHealth = 100;
+  enemyID = 0;
+  newStart();
 }
 
 void mouseWheel(MouseEvent event) {
