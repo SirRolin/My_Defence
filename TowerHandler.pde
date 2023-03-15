@@ -16,7 +16,7 @@ class TowerHandler {
   //// initialise
   public void initiateTowers() {
     //// get data via the FileIO class I made
-    ArrayList<String> data = FileIO.readFileData("C:\\Users\\nicol\\Documents\\GitHub\\My_Defence/Data/Towers.txt", false, true);
+    ArrayList<String> data = FileIO.readFileData("C:\\Users\\nicol\\Documents\\GitHub\\My_Defence/Data/Towers.csv", true, true);
     //// initialise towers
     towers = new ArrayList<>();
     int lineNumber = 0;
@@ -32,7 +32,7 @@ class TowerHandler {
       }
       catch (Exception e) {
         //// if something went from, skip this tower
-        println("Error in loading tower at line: " + lineNumber)
+        println("Error in loading tower at line: " + lineNumber);
         continue;
       }
       int baseDamage;
@@ -41,7 +41,7 @@ class TowerHandler {
       }
       catch (Exception e) {
         //// if something went from, skip this tower
-        println("Error in loading tower at line: " + lineNumber)
+        println("Error in loading tower at line: " + lineNumber);
         continue;
       }
       float fireRate;
@@ -50,7 +50,7 @@ class TowerHandler {
       }
       catch (Exception e) {
         //// if something went from, skip this tower
-        println("Error in loading tower at line: " + lineNumber)
+        println("Error in loading tower at line: " + lineNumber);
         continue;
       }
       int projectile;
@@ -59,7 +59,7 @@ class TowerHandler {
       }
       catch (Exception e) {
         //// if something went from, skip this tower
-        println("Error in loading tower at line: " + lineNumber)
+        println("Error in loading tower at line: " + lineNumber);
         continue;
       }
       int tColor;
@@ -68,7 +68,7 @@ class TowerHandler {
       }
       catch (Exception e) {
         //// if something went from, skip this tower
-        println("Error in loading tower at line: " + lineNumber)
+        println("Error in loading tower at line: " + lineNumber);
         continue;
       }
       int aColor;
@@ -77,7 +77,7 @@ class TowerHandler {
       }
       catch (Exception e) {
         //// if something went from, skip this tower
-        println("Error in loading tower at line: " + lineNumber)
+        println("Error in loading tower at line: " + lineNumber);
         continue;
       }
       float size;
@@ -86,7 +86,7 @@ class TowerHandler {
       }
       catch (Exception e) {
         //// if something went from, skip this tower
-        println("Error in loading tower at line: " + lineNumber)
+        println("Error in loading tower at line: " + lineNumber);
         continue;
       }
       float range;
@@ -95,7 +95,7 @@ class TowerHandler {
       }
       catch (Exception e) {
         //// if something went from, skip this tower
-        println("Error in loading tower at line: " + lineNumber)
+        println("Error in loading tower at line: " + lineNumber);
         continue;
       }
       
