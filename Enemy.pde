@@ -1,7 +1,8 @@
 
   
 class Enemy{
-  int speedDivide = 500;
+  private int speedDivide = 5000;
+  float maxHP;
   float HP;
   float speed;
   int icon;
@@ -20,17 +21,14 @@ class Enemy{
     //// Temporarily just use these values as I don't need to impliment multiple enemy types yet.
     pointsWorth = 1;
     HP = 10;
+    maxHP = HP;
     speed = 5;
     icon = 1;
     spawnCD = 50;
   }
 
-  public void Update(){
-    this.move();
-  }
-
-  private void move() {
-    float movement = (speed / (float) speedDivide);
+  public void Update(double updateSpeed){
+    float movement = (float) ((speed / (float) speedDivide) * updateSpeed);
     this.move(movement);
   }
   
@@ -52,41 +50,46 @@ class Enemy{
         this.move(movement - movementToNext);
       }
     } else {
-      float normaliseDivide = java.lang.Math.max(abs(xDiff),abs(yDiff));
-      boolean negX = xDiff<0?true:false;
-      boolean negY = yDiff<0?true:false;
-      if(normaliseDivide != 0){
-        xDiff = xDiff / normaliseDivide;
-        yDiff = yDiff / normaliseDivide;
-      } else {
-        xDiff = 0;
-        yDiff = 0;
-      }
-      if(yDiff > 1) {
-        println("error yDiff: " + yDiff);
-        noLoop();
-      }
-      if(xDiff > 1) {
-        println("error xDiff: " + xDiff);
-        noLoop();
-      }
-      float tempXDiff = (float) FastMath.mySqrt(1 - (yDiff * yDiff));
-      yDiff = (float) FastMath.mySqrt(1 - (xDiff * xDiff));
-      xDiff = tempXDiff;
-      
-      coord.x += xDiff * movement * (negX?-1:1);
-      coord.y += yDiff * movement * (negY?-1:1);
+      float[] normalisedValues = FastMath.normalise(xDiff, yDiff);
+      xDiff = normalisedValues[0];
+      yDiff = normalisedValues[1];
+      coord.x += xDiff * movement;
+      coord.y += yDiff * movement;
     }
   }
 
   public void Display(){
-    float tileSize = 100 * zoom / 20.0;
-    float x = width/2 + camX * tileSize + coord.x * tileSize;
-    float y = height/2 + camY * tileSize + coord.y * tileSize;
-    float size = 5 * zoom / 20.0;
+    float _tileSize = tileSize * zoom / 20.0;
+    //// convert it's coordinates from world to the screen coordinates
+    Coord screenCoord = coord.worldToScreen();
+    float x = screenCoord.x;
+    float y = screenCoord.y;
+    
+    float size = _tileSize / 20.0;
+    
+    //// body
     noStroke();
     fill(200,0,0);
     rect(x, y, size, size);
+    
+    //// health bar
+    float percHP = HP / maxHP;
+    float healthMidOffset = _tileSize * 0.1 * (1 - percHP) / 2;
+    fill(255,40,40,210);
+    rect(x - healthMidOffset, y - 20 * zoom / 20.0, _tileSize * 0.1 - (healthMidOffset * 2), _tileSize * 0.02);
+    strokeWeight(_tileSize / 400.0);
+    stroke(0);
+    noFill();
+    rect(x, y - 20 * zoom / 20.0, _tileSize * 0.1, _tileSize * 0.02);
+  }
+  
+  public float getProgress(){
+    if(nextTile != null) {
+      //// needs work.
+      return nextTile.progress * (tileSize * zoom / 20.0) + abs(nextTile.coord.x - coord.x) + abs(nextTile.coord.y - coord.y);
+    } else { 
+      return 0.0; 
+    }
   }
   
   //// Deletes the enemy
@@ -96,6 +99,7 @@ class Enemy{
         enemies.remove(i);
       }
     }
+    this.HP = 0;
     if(enemies.size() == 0){
       hasEnemies = false;
     }
