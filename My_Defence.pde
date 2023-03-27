@@ -133,6 +133,7 @@ void draw() {
   } else if (pressedKeys.contains((int) 'S')) {
     camY -= 1.0 / zoom;
   }
+  
   //// Cam Zoom with keyboard
   if (pressedKeys.contains((int) 'E')) {
     zoom=Math.min(maxZoom, zoom + 1);

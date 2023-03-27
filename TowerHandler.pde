@@ -16,7 +16,7 @@ class TowerHandler {
   //// initialise
   public void initiateTowers() {
     //// get data via the FileIO class I made
-    ArrayList<String> data = FileIO.readFileData("C:\\Users\\nicol\\Documents\\GitHub\\My_Defence/Data/Towers.csv", true, true);
+    ArrayList<String> data = FileIO.readFileData(FileIO.getDocument()+"/Devoted Engine/My_Defence/Data/Towers.csv", true, true, defaultStructure);
     //// initialise towers
     towers = new ArrayList<>();
     int lineNumber = 0;
@@ -116,4 +116,8 @@ class TowerHandler {
       return towers.get(index);
     }
   }
+  
+  private String[] defaultStructure = {"cost, damage, fire rate, projectile (set to 1 for now), tower color, attack color, size, range (50 = 1 tile)",
+  "1,3,3,1,3000,3000,10,150",
+  "2,7,13,1,0,0,20,100"};
 }
